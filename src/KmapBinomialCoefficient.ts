@@ -27,6 +27,7 @@ export class KmapBinomialCoefficient extends LitElement {
         gap: 16px;
       }
       .boxes {
+        width: 232px;
         display: flex;
         gap: 8px;
       }
@@ -51,6 +52,9 @@ export class KmapBinomialCoefficient extends LitElement {
         justify-items: center;
         gap: 8px;
         white-space: nowrap;
+      }
+      label {
+        width: 48px;
       }
     `];
 
@@ -91,6 +95,13 @@ export class KmapBinomialCoefficient extends LitElement {
       </div>
       ` : html`<div style="align-self: start">n muss größer als k sein!</div>`}
     `;
+  }
+
+  protected willUpdate(_changedProperties: PropertyValues) {
+    if (_changedProperties.has("_n") || _changedProperties.has("_k")) {
+      if (this._k > this._n)
+        this._k = this._n;
+    }
   }
 
   protected updated(_changedProperties: PropertyValues) {
