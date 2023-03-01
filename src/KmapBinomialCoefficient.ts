@@ -29,23 +29,33 @@ export class KmapBinomialCoefficient extends LitElement {
       .boxes {
         width: 232px;
         display: flex;
+        justify-content: center;
         gap: 8px;
       }
       .box {
         height: 16px;
         width: 16px;
         border-radius: 4px;
-        background-color: coral;
+        background-color: var(--kmap-binomial-coefficient-k-color, coral);
         transition: background-color .1s ease-in-out;
       }
       .box[m] {
-        background-color: lightblue;
+        background-color: var(--kmap-binomial-coefficient-not-k-color, deepskyblue);
       }
       #k {
-        accent-color: coral;
+        accent-color: var(--kmap-binomial-coefficient-k-color, coral);
       }
       #n {
-        accent-color: darkgray;
+        accent-color: var(--kmap-binomial-coefficient-n-color, darkslategray);
+      }
+      .k {
+        color: var(--kmap-binomial-coefficient-k-color, coral);
+      }
+      .notk {
+        color: var(--kmap-binomial-coefficient-n-color, deepskyblue);
+      }
+      .n {
+        color: var(--kmap-binomial-coefficient-n-color, darkslategray);
       }
       div.input {
         display: flex;
@@ -76,7 +86,7 @@ export class KmapBinomialCoefficient extends LitElement {
 
   render() {
     const arr = this._combi !== undefined ? Array.from(this._combi) : undefined;
-    const kat = katex.renderToString('\\displaystyle {' + this._n + '\\choose' + this._k + '}=\\frac{' + this._n + '!}{\\color{coral}' + this._k + '!\\;\\color{lightblue}' + (this._n - this._k) + '!}=' + this._b,
+    const kat = katex.renderToString('\\displaystyle {\\htmlClass{n}' + this._n + '\\choose\\htmlClass{k}' + this._k + '}=\\frac{\\htmlClass{n}' + this._n + '!}{\\htmlClass{k}' + this._k + '!\\;\\htmlClass{notk}' + (this._n - this._k) + '!}=' + this._b,
         { output: "html", throwOnError: false, trust: true, displayMode: false });
     return html`
       <div>
@@ -86,7 +96,7 @@ export class KmapBinomialCoefficient extends LitElement {
       </div>
       ${arr ? html`
       <div>
-        <div>» ${this._k} aus ${this._n} «</div>
+        <div>» <span class="k">${this._k}</span> aus <span class="n">${this._n}</span> «</div>
         <div class="boxes">
           ${arr.map(b => html`<div class="box" ?m="${b === '1'}"></div>`)}
         </div>
