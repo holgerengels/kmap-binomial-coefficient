@@ -1,6 +1,6 @@
 {
   "name": "kmap-binomial-coefficient",
-  "version": "0.9.3",
+  "version": "0.9.4",
   "description": "Interactively demonstrate the binomial coefficient",
   "license": "MIT",
   "author": "Holger Engels",
