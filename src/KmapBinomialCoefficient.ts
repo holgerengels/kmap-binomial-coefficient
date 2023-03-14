@@ -83,6 +83,8 @@ export class KmapBinomialCoefficient extends LitElement {
   _combi: string[] = Array.from('110000');
   @state()
   _combis: string[][] = [];
+  private _interval?: NodeJS.Timer;
+  private _timeout?: NodeJS.Timeout;
 
   render() {
     const arr = this._combi !== undefined ? Array.from(this._combi) : undefined;
@@ -91,7 +93,7 @@ export class KmapBinomialCoefficient extends LitElement {
     return html`
       <div>
         <div class="input"><label for="n">n = ${this._n}</label><input id="n" type="range" min="1" max="10" .value=${this._n} @input="${(e: Event) => this._n = parseInt((e.target as HTMLInputElement).value)}"></div>
-        <div class="input"><label for="k">k = ${this._k}</label><input id="k" type="range" min="1" max="${this._n}" .value=${this._k} @input="${(e: Event) => this._k = parseInt((e.target as HTMLInputElement).value)}"></div>
+        <div class="input"><label for="k">k = ${this._k}</label><input id="k" type="range" min="0" max="${this._n}" .value=${this._k} @input="${(e: Event) => this._k = parseInt((e.target as HTMLInputElement).value)}"></div>
         <div>${unsafeHTML(kat)}</div>
       </div>
       ${arr ? html`
@@ -103,12 +105,17 @@ export class KmapBinomialCoefficient extends LitElement {
         <div class="input"><svg @click="${this._start}" xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 96 960 960" width="24"><path d="M320 853V293l440 280-440 280Zm60-280Zm0 171 269-171-269-171v342Z"/></svg>
           <input id="i" type="range" min="0" max="${this._b-1}" .value=${this._i} @input="${(e: Event) => this._i = parseInt((e.target as HTMLInputElement).value)}"></div>
       </div>
-      ` : html`<div style="align-self: start">n muss größer als k sein!</div>`}
+      ` : html`<div style="align-self: start">n muss größer oder gleich k sein!</div>`}
     `;
   }
 
   protected willUpdate(_changedProperties: PropertyValues) {
     if (_changedProperties.has("_n") || _changedProperties.has("_k")) {
+      if (this._interval)
+        clearInterval(this._interval);
+      if (this._timeout)
+        clearTimeout(this._timeout);
+
       if (this._k > this._n)
         this._k = this._n;
     }
@@ -119,7 +126,7 @@ export class KmapBinomialCoefficient extends LitElement {
       this._i = 0;
       this.createCombis();
       this._combi = this._combis[0];
-      this._b = fak(this._n) / fak(this._k) / fak(this._n - this._k)
+      this._b = fak(this._n) / fak(this._k) / fak(this._n - this._k);
     }
     if (_changedProperties.has("_i")) {
       this._combi = this._combis[this._i];
@@ -127,11 +134,15 @@ export class KmapBinomialCoefficient extends LitElement {
   }
   private _start() {
     this._i = 0;
-    let timer = setInterval(() => {
-      this._i ++;
-      if (this._i >= this._combis.length - 1) {
-        clearInterval(timer);
-        setTimeout(() => this._i = 0, 1000);
+    this._interval = setInterval(() => {
+      if (this._i < this._combis.length - 1)
+        this._i ++;
+      else {
+        if (this._interval) {
+          clearInterval(this._interval);
+          this._interval = undefined;
+          this._timeout = setTimeout(() => { this._i = 0; this._interval = undefined }, 1000);
+        }
       }
     }, 5000 / this._b);
   }
